@@ -6,7 +6,24 @@
     <description>Recent content in Posts on 永远相信美好的事情即将发生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 09 Sep 2022 12:00:22 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 09 Sep 2022 20:09:24 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Frp自建内网穿透</title>
+      <link>https://XiaoMing132.github.io/post/frp/</link>
+      <pubDate>Fri, 09 Sep 2022 20:09:24 +0800</pubDate>
+      
+      <guid>https://XiaoMing132.github.io/post/frp/</guid>
+      <description>frp是一个内网穿透的软件，可以自己配置相对于其他的穿透软件更为强大，客户端和服务端均需要安装frp，该教程需要一台linux服务器 ####注意:若复制该教程上的代码到服务器，请删除代码之后的#号的注释信息，因为服务器可能会无法识别，最好客户端上的注释也一并删掉 ###1:首先从github上下载frp软件 https://github.com/fatedier/frp/releases
+###2:下载玩下来后后解压可以得到好几个文件，以c结尾的为客户端的，以s结尾的为服务端的，保留对应的就是了，其他的可以删掉
+###3:配置服务端,使用vim frpc.ini查看frpc.ini配置文件 [common] bind_port = 7000 ~ 表示frp绑定本机7000端口，可自行修改，注意：防火墙需要放行绑定的端口
+###3:在后台启动frp服务端 ./frps -c frpc.ini &amp;amp;
+###4:在客户端修改客户端配置文件frpc.ini：在客户端使用vim frpc.ini [common] server_addr = 服务器地址 server_port = 服务器端口 ~ ###5:客户端开启frp连接服务器 ./frpc -c frpc.ini
+###6:此时客户端已经与服务端连接成功了，接下来我们配置下仪表盘，当然这个不是必须的，你们可以忽略这部配置。配置也很简单，分别在服务端frps.ini和客户端frpc.ini配置文件下添加如下 [common] bind_port = 7000 dashboard_port = 7500 #服务端仪表面板的端口 dashboard_user = admin #仪表盘登录名 dashboard_pwd = admin #仪表盘登录密码
+###7:接下来使用仪表盘端口进行访问了 http://你的IP地址:仪表盘端口 提示:不使用仪表盘的话可以忽略 6 7 步
+###8:修改客户端frpc.ini给客户端配置一个tcp通道穿透到ssh服务 [common] server_addr = 服务器地址 server_port = 服务器端口
+[ssh] #通道名字 type = tcp local_ip = 127.</description>
+    </item>
+    
     <item>
       <title>Atufa</title>
       <link>https://XiaoMing132.github.io/post/atufa/</link>
