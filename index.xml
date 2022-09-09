@@ -6,7 +6,17 @@
     <description>Recent content on 永远相信美好的事情即将发生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 09 Sep 2022 20:09:24 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 10 Sep 2022 02:42:45 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ngix设置反向代理和负载均衡</title>
+      <link>https://XiaoMing132.github.io/post/a/</link>
+      <pubDate>Sat, 10 Sep 2022 02:42:45 +0800</pubDate>
+      
+      <guid>https://XiaoMing132.github.io/post/a/</guid>
+      <description>Nginx作为一款轻量级的web服务器，很受大家欢迎，今天为大家简单简单介绍一下ngix如何设置反向代理和负载均衡 其实Nginx设置反向代理非常简单，只需要在找到配置文件在配置文件的http模块中加入一下几行代码就Ok了 upstream albert{ #albert为负载均衡名字可以任取 server 43.143.78.123:80 weight=1; #负载均衡的服务,weight为权重 server www.baidu.com weight=1; } server{ listen 81;　#服务监听端口 server_name localhost;　#服务名字 location / { #访问该端口根目录下会被执行一下代码 proxy_pass http://albert;　#反向代理到负载均衡，这里也可以直接写访问路径或代理主机 } }
+注意：若复制以上代码到server请把注释删掉以免出现问题，修改配置文件都要记得加分号</description>
+    </item>
+    
     <item>
       <title>Frp自建内网穿透</title>
       <link>https://XiaoMing132.github.io/post/frp/</link>
