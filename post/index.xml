@@ -22,8 +22,29 @@
       <pubDate>Fri, 09 Sep 2022 11:31:53 +0800</pubDate>
       
       <guid>https://XiaoMing132.github.io/post/albert/</guid>
-      <description>hugo + github 搭建个人博客还算比较简单，步骤呢百度几乎也可以查到，接下来以我的经验带大家搭建一个静态的个人博客 ###1:首先访问hugo下载对应的包进行安装 https://github.com/gohugoio/hugo/releases ###2:本人用的是ubuntu系统下载的是deb的包，下载完成后找到对应的文件使用dpkg命令安装hugo dpkg &amp;ndash;install hugo_0.102.3_Linux-64bit.deb ###3:安装完成创建一个自己的博客目录 hugo new site MyBlog ###4:创建完后因为我们是没有主题的，也就是没有模板的，所以说要从网上下载一个主题，访问一下网站下载主题 https://themes.gohugo.io/ ###5:我这里下的是一个m10c的主题，下载完后需要将主题放到MyBlog/theme/下,主题配置好后使用命令创建一个内容，注意hugo使用的是md文档 hugo new post/test.md ###6:创建完后可以编辑test.md写自己文档，接下来可以开启本地服务查看预览了,注意要在MyBlog下执行命令 hugo server -t mytheme &amp;ndash;buildDrafts ###7:接下来我们要将本地的博客部署到github上，首先要在github上创建一个自己的仓库，仓库名称必须为 你的名称.github.io 否则后面会出错
-###8:接下来我们首先要使用hugo命令创建一个本地仓库，同样也要在MyBlog目录下 hugo &amp;ndash;theme=mytheme &amp;ndash;baseUrl=&amp;ldquo;你的仓库地址&amp;rdquo; &amp;ndash;buildDrafts ###9:执行上条命令后会在MyBlog目录下会生成一个public文件，这个就是一个本地的仓库，现在我们使用git命令绑定远程仓库以便以后push上去 git remote add origin &amp;ldquo;你的仓库地址&amp;rdquo; ###10:接下来切换到public目录就可以push到github上了,提交时要输入github用户名和密码 cd public/ &amp;amp;&amp;amp; git add . &amp;amp;&amp;amp; git commit -m &amp;ldquo;commit&amp;rdquo; &amp;amp;&amp;amp; git push -u origin master ###11:现在完成了访问你的仓库地址就可以查看了 https://仓库名 ###12:如果后续要增加内容上去到github重复5 8 10步骤</description>
+      <description>hugo + github 搭建个人博客还算比较简单，步骤呢百度几乎也可以查到，接下来以我的经验带大家搭建一个静态的个人博客
+###1:首先访问hugo下载对应的包进行安装
+https://github.com/gohugoio/hugo/releases
+###2:本人用的是ubuntu系统下载的是deb的包，下载完成后找到对应的文件使用dpkg命令安装hugo
+dpkg &amp;ndash;install hugo_0.102.3_Linux-64bit.deb
+###3:安装完成创建一个自己的博客目录
+hugo new site MyBlog
+###4:创建完后因为我们是没有主题的，也就是没有模板的，所以说要从网上下载一个主题，访问一下网站下载主题
+https://themes.gohugo.io/
+###5:我这里下的是一个m10c的主题，下载完后需要将主题放到MyBlog/theme/下,主题配置好后使用命令创建一个内容，注意hugo使用的是md文档
+hugo new post/test.md
+###6:创建完后可以编辑test.md写自己文档，接下来可以开启本地服务查看预览了,注意要在MyBlog下执行命令
+hugo server -t mytheme &amp;ndash;buildDrafts
+###7:接下来我们要将本地的博客部署到github上，首先要在github上创建一个自己的仓库，仓库名称必须为 你的名称.github.io 否则后面会出错
+###8:接下来我们首先要使用hugo命令创建一个本地仓库，同样也要在MyBlog目录下
+hugo &amp;ndash;theme=mytheme &amp;ndash;baseUrl=&amp;ldquo;你的仓库地址&amp;rdquo; &amp;ndash;buildDrafts
+###9:执行上条命令后会在MyBlog目录下会生成一个public文件，这个就是一个本地的仓库，现在我们使用git命令绑定远程仓库以便以后push上去
+git remote add origin &amp;ldquo;你的仓库地址&amp;rdquo;
+###10:接下来切换到public目录就可以push到github上了,提交时要输入github用户名和密码
+cd public/ &amp;amp;&amp;amp; git add . &amp;amp;&amp;amp; git commit -m &amp;ldquo;commit&amp;rdquo; &amp;amp;&amp;amp; git push -u origin master
+###11:现在完成了访问你的仓库地址就可以查看了
+https://仓库名
+###12:如果后续要增加内容上去到github重复5 8 10步骤</description>
     </item>
     
   </channel>
