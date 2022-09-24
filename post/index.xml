@@ -6,7 +6,21 @@
     <description>Recent content in Posts on 永远相信美好的事情即将发生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 10 Sep 2022 02:42:45 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 25 Sep 2022 00:39:52 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>linux Firewall-cmd的使用</title>
+      <link>https://XiaoMing132.github.io/post/firewall/</link>
+      <pubDate>Sun, 25 Sep 2022 00:39:52 +0800</pubDate>
+      
+      <guid>https://XiaoMing132.github.io/post/firewall/</guid>
+      <description>##最近看firewall-cmd的man文档感觉不好记，就把常见的几个firewall命令记在了博客上。下面几个命令Firewall已经能满足大部分需求了 ###1:查看防火墙规则 firewall-cmd &amp;ndash;list-all
+###2:重新加载防火墙 firewall-cmd &amp;ndash;reload
+###3:永久放行80端口 firewall-cmd &amp;ndash;add-port=80 &amp;ndash;permanent
+###4:firewall临时放行http服务 firewall-cmd &amp;ndash;add-service=http
+###5:firewall永久只允许173.1.3.12连接ssh firewall-cmd &amp;ndash;add-rich-rule &amp;lsquo;rule family=&amp;ldquo;ipv4&amp;rdquo; source address=&amp;ldquo;173.1.3.12/32&amp;rdquo; port port=&amp;ldquo;22&amp;rdquo; protocol=&amp;ldquo;tcp&amp;rdquo; accept&amp;rsquo; &amp;ndash;permanent
+###上面要放行的端口或参数自己替换掉就行了</description>
+    </item>
+    
     <item>
       <title>ngix设置反向代理和负载均衡</title>
       <link>https://XiaoMing132.github.io/post/a/</link>
