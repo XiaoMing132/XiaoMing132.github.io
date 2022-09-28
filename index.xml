@@ -6,7 +6,21 @@
     <description>Recent content on 永远相信美好的事情即将发生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 25 Sep 2022 00:39:52 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 28 Sep 2022 22:38:14 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Markdown的基本语法使用</title>
+      <link>https://XiaoMing132.github.io/post/markdown/</link>
+      <pubDate>Wed, 28 Sep 2022 22:38:14 +0800</pubDate>
+      
+      <guid>https://XiaoMing132.github.io/post/markdown/</guid>
+      <description>#一级标题 ##二级标题 ###三级标题
+#一级标题 ##二级标题 ###三级标题 #引用一段话 &amp;gt; 所引用的话 #使用C语言代码块
+int main(void){ cout&amp;lt;&amp;lt;hello word; return 0; } ```c
+你的代码
+``` #换行
+按两个或多个空格再按回车键 #Markdown转义字符 \</description>
+    </item>
+    
     <item>
       <title>linux Firewall-cmd的使用</title>
       <link>https://XiaoMing132.github.io/post/firewall/</link>
