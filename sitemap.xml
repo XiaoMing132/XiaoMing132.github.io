@@ -2,13 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://XiaoMing132.github.io/post/markdown/</loc>
-    <lastmod>2022-09-28T22:38:14+08:00</lastmod>
+    <loc>https://XiaoMing132.github.io/post/pro/</loc>
+    <lastmod>2022-10-06T18:35:41+08:00</lastmod>
   </url><url>
     <loc>https://XiaoMing132.github.io/post/</loc>
-    <lastmod>2022-09-28T22:38:14+08:00</lastmod>
+    <lastmod>2022-10-06T18:35:41+08:00</lastmod>
   </url><url>
     <loc>https://XiaoMing132.github.io/</loc>
+    <lastmod>2022-10-06T18:35:41+08:00</lastmod>
+  </url><url>
+    <loc>https://XiaoMing132.github.io/post/c&#43;&#43;_socket/</loc>
+    <lastmod>2022-09-29T21:34:19+08:00</lastmod>
+  </url><url>
+    <loc>https://XiaoMing132.github.io/post/markdown/</loc>
     <lastmod>2022-09-28T22:38:14+08:00</lastmod>
   </url><url>
     <loc>https://XiaoMing132.github.io/post/firewall/</loc>

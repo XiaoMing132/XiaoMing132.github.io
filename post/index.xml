@@ -6,7 +6,35 @@
     <description>Recent content in Posts on 永远相信美好的事情即将发生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 28 Sep 2022 22:38:14 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 06 Oct 2022 18:35:41 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>linux关闭终端保持进程持续运行</title>
+      <link>https://XiaoMing132.github.io/post/pro/</link>
+      <pubDate>Thu, 06 Oct 2022 18:35:41 +0800</pubDate>
+      
+      <guid>https://XiaoMing132.github.io/post/pro/</guid>
+      <description>##最近在服务器安装一个服务时，发现一旦把中端关了服务也就关了，后面查阅了一下资料解决了该问题，解决方法可以由好几种大家可以找到适合自己的解决方法 ###问题产生原因
+如果直接关闭终端，终端会向当前环境启动的后台任务发送SIGHUP信号，让运行的程序挂起，那么忽略SIGHUP信号就行啦。
+###解决方法 1:使用nohup命令，从名字就看出是否挂起运行命令，关闭终端或者退出某个账号，进程也继续保持运行状态，同样要配合【&amp;amp;】符号一起使用。 用法：nohup Command [ Arg … ] [&amp;amp;]
+$ nohup sh test.sh &amp;amp; # 直接关闭当前终端，再打开一个查看 $ ps -few|grep test.sh 123 2:使用setsid命令可以使程序打开新的进程，该进程继承了父进程组的ID。从下图可以看到，test.sh脚本的父进程已经是init 1，此时不管关闭还是退出终端，已经和后台的程序没有关系了。
+$ setsid sh test.sh 1 setsid与nohup的一个重要区别是：不需要使用&amp;amp;压入后台。 此法使运行的进程以root身份运行，多少有些安全隐患。 3:使用exit命令退出终端，我们的程序还是会继续运行，这是为什么呢？这是因为使用exit命令退出终端时不会向终端所属任务发SIGHUP信号，这是huponexit 配置项控制的，默认是off，可以使用shopt 命令查
+[root@api ~]# shopt |grep huponexit huponexit off 12 将huponexit 配置成on，再次使用exit命令退出，所属的任务就会跟随退出。
+[root@api ~]# shopt -s huponexit [root@api ~]# shopt |grep huponexit huponexit on 123 4:screen命令用于管理多个终端，它可以创建终端，让程序在里面运行。
+screen sh test.sh &amp;amp; 1 </description>
+    </item>
+    
+    <item>
+      <title>C&#43;&#43;基本网络编程</title>
+      <link>https://XiaoMing132.github.io/post/c&#43;&#43;_socket/</link>
+      <pubDate>Thu, 29 Sep 2022 21:34:19 +0800</pubDate>
+      
+      <guid>https://XiaoMing132.github.io/post/c&#43;&#43;_socket/</guid>
+      <description>#本教程主要讲述的是c++网络编程，需要一定的c++基础和计算机网络基础以及操作系统基础，话不多说，直接开始教程 ###首先还是来介绍一些名词
+socket: 通道，运行在计算机的两个程序通过socket建立起一个通道,数据在通道中传输 socket的分类: socket提供了流(stream) 和 数据表(datagram)两种通信机制，stream采用tcp，datagram采用udp协议。至于这两种协议有什么区别就不介绍了，但凡学过计网的应该都懂吧 memset函数:给数组或结构图初始化函数，需包含头文件&amp;lt;cstring&amp;gt; memset(a,0,sizeiof(a)) 参数分别为指向数组的指针,初始化的值，大小 socket函数: 创建通道的函数，需包含头文件&amp;lt;sys/socket.h&amp;gt;，函数原型:int socket(int af, int type, int protocol); 参数:af 为地址族（Address Family），也就是 IP 地址类型，常用的有 AF_INET 和 AF_INET6。 type 为数据传输方式/套接字类型，常用的有 SOCK_STREAM（流格式套接字/面向连接的套接字） 和 SOCK_DGRAM（数据报套接字/无连接的套接字）protocol 表示传输协议，常用的有 IPPROTO_TCP 和 IPPTOTO_UDP，分别表示 TCP 传输协议和 UDP 传输协议。返回值为 0 1 -1，0和1都是有效的，0代表标准输入，1代表标准输出，-1代表创建失败 主机字节序和网络字节系:字节序是指占内存多于一个字节类型的数据在内存中的存放顺序，一个32位整数由4个字节组成。在内存中由两种存储方法:一种是将低字节序存储在起始地址，称为小端存储。另外一种则是将高字节序存储在起始地址，称为大端存储。列如 0x12345678 这个数据大端存储和小端存储分别为: 大端存储: 12 34 56 78 小端存储：78 56 34 12 网络字节序是TCP/IP中规定好的一种数据表示格式采用大端存储，主机字节序与网络字节序不同，它与cpu的设置有关，由的是大端存储，有的是小端存储。为了避免字节序不一样，我们在通信中统一采用网络字节序。 网络字节序和主机字节序的转换函数:htosn(),ntohs(),htonl(),ntohl()。htons和ntohs完成16位无符号数的相互转化，另外两个完成的是32位无符号数的转换
+####1:接下来是服务端的工作流程: 1.创建服务端的socket。 2.把服务端用于通信的地址和端口绑定到socket上。 3.把socket设置为监听模式。 4.接受客户端的连接。 5.与客户端通信，接收客户端发过来的报文后，回复处理结果。 6.不断的重复第5步，直到客户端断开连接。 7.关闭socket，释放资源。 #####服务端代码展示server.cpp
+#include &amp;lt;stdio.h&amp;gt; #include &amp;lt;string.h&amp;gt; #include &amp;lt;unistd.</description>
+    </item>
+    
     <item>
       <title>Markdown的基本语法使用</title>
       <link>https://XiaoMing132.github.io/post/markdown/</link>
@@ -18,7 +46,7 @@
 int main(void){ cout&amp;lt;&amp;lt;hello word; return 0; } ```c
 你的代码
 ``` #换行
-按两个或多个空格再按回车键 #Markdown转义字符 \</description>
+按两个或多个空格再按回车键 #Markdown转义字符 \ ###加粗和倾斜 使用一个表示倾斜，两个表示加粗 *倾斜* **加粗**</description>
     </item>
     
     <item>

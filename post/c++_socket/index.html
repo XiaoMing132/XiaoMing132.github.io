@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>C&#43;&#43;基本网络编程 // 永远相信美好的事情即将发生</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.102.3" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="John Doe" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="https://XiaoMing132.github.io/css/main.min.88e7083eff65effb7485b6e6f38d10afbec25093a6fac42d734ce9024d3defbd.css" />
+
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="C&#43;&#43;基本网络编程"/>
+<meta name="twitter:description" content="#本教程主要讲述的是c&#43;&#43;网络编程，需要一定的c&#43;&#43;基础和计算机网络基础以及操作系统基础，话不多说，直接开始教程 ###首先还是来介绍一些名词
+socket: 通道，运行在计算机的两个程序通过socket建立起一个通道,数据在通道中传输 socket的分类: socket提供了流(stream) 和 数据表(datagram)两种通信机制，stream采用tcp，datagram采用udp协议。至于这两种协议有什么区别就不介绍了，但凡学过计网的应该都懂吧 memset函数:给数组或结构图初始化函数，需包含头文件&lt;cstring&gt; memset(a,0,sizeiof(a)) 参数分别为指向数组的指针,初始化的值，大小 socket函数: 创建通道的函数，需包含头文件&lt;sys/socket.h&gt;，函数原型:int socket(int af, int type, int protocol); 参数:af 为地址族（Address Family），也就是 IP 地址类型，常用的有 AF_INET 和 AF_INET6。 type 为数据传输方式/套接字类型，常用的有 SOCK_STREAM（流格式套接字/面向连接的套接字） 和 SOCK_DGRAM（数据报套接字/无连接的套接字）protocol 表示传输协议，常用的有 IPPROTO_TCP 和 IPPTOTO_UDP，分别表示 TCP 传输协议和 UDP 传输协议。返回值为 0 1 -1，0和1都是有效的，0代表标准输入，1代表标准输出，-1代表创建失败 主机字节序和网络字节系:字节序是指占内存多于一个字节类型的数据在内存中的存放顺序，一个32位整数由4个字节组成。在内存中由两种存储方法:一种是将低字节序存储在起始地址，称为小端存储。另外一种则是将高字节序存储在起始地址，称为大端存储。列如 0x12345678 这个数据大端存储和小端存储分别为: 大端存储: 12 34 56 78 小端存储：78 56 34 12 网络字节序是TCP/IP中规定好的一种数据表示格式采用大端存储，主机字节序与网络字节序不同，它与cpu的设置有关，由的是大端存储，有的是小端存储。为了避免字节序不一样，我们在通信中统一采用网络字节序。 网络字节序和主机字节序的转换函数:htosn(),ntohs(),htonl(),ntohl()。htons和ntohs完成16位无符号数的相互转化，另外两个完成的是32位无符号数的转换
+####1:接下来是服务端的工作流程: 1.创建服务端的socket。 2.把服务端用于通信的地址和端口绑定到socket上。 3.把socket设置为监听模式。 4.接受客户端的连接。 5.与客户端通信，接收客户端发过来的报文后，回复处理结果。 6.不断的重复第5步，直到客户端断开连接。 7.关闭socket，释放资源。 #####服务端代码展示server.cpp
+#include &lt;stdio.h&gt; #include &lt;string.h&gt; #include &lt;unistd."/>
+
+    <meta property="og:title" content="C&#43;&#43;基本网络编程" />
+<meta property="og:description" content="#本教程主要讲述的是c&#43;&#43;网络编程，需要一定的c&#43;&#43;基础和计算机网络基础以及操作系统基础，话不多说，直接开始教程 ###首先还是来介绍一些名词
+socket: 通道，运行在计算机的两个程序通过socket建立起一个通道,数据在通道中传输 socket的分类: socket提供了流(stream) 和 数据表(datagram)两种通信机制，stream采用tcp，datagram采用udp协议。至于这两种协议有什么区别就不介绍了，但凡学过计网的应该都懂吧 memset函数:给数组或结构图初始化函数，需包含头文件&lt;cstring&gt; memset(a,0,sizeiof(a)) 参数分别为指向数组的指针,初始化的值，大小 socket函数: 创建通道的函数，需包含头文件&lt;sys/socket.h&gt;，函数原型:int socket(int af, int type, int protocol); 参数:af 为地址族（Address Family），也就是 IP 地址类型，常用的有 AF_INET 和 AF_INET6。 type 为数据传输方式/套接字类型，常用的有 SOCK_STREAM（流格式套接字/面向连接的套接字） 和 SOCK_DGRAM（数据报套接字/无连接的套接字）protocol 表示传输协议，常用的有 IPPROTO_TCP 和 IPPTOTO_UDP，分别表示 TCP 传输协议和 UDP 传输协议。返回值为 0 1 -1，0和1都是有效的，0代表标准输入，1代表标准输出，-1代表创建失败 主机字节序和网络字节系:字节序是指占内存多于一个字节类型的数据在内存中的存放顺序，一个32位整数由4个字节组成。在内存中由两种存储方法:一种是将低字节序存储在起始地址，称为小端存储。另外一种则是将高字节序存储在起始地址，称为大端存储。列如 0x12345678 这个数据大端存储和小端存储分别为: 大端存储: 12 34 56 78 小端存储：78 56 34 12 网络字节序是TCP/IP中规定好的一种数据表示格式采用大端存储，主机字节序与网络字节序不同，它与cpu的设置有关，由的是大端存储，有的是小端存储。为了避免字节序不一样，我们在通信中统一采用网络字节序。 网络字节序和主机字节序的转换函数:htosn(),ntohs(),htonl(),ntohl()。htons和ntohs完成16位无符号数的相互转化，另外两个完成的是32位无符号数的转换
+####1:接下来是服务端的工作流程: 1.创建服务端的socket。 2.把服务端用于通信的地址和端口绑定到socket上。 3.把socket设置为监听模式。 4.接受客户端的连接。 5.与客户端通信，接收客户端发过来的报文后，回复处理结果。 6.不断的重复第5步，直到客户端断开连接。 7.关闭socket，释放资源。 #####服务端代码展示server.cpp
+#include &lt;stdio.h&gt; #include &lt;string.h&gt; #include &lt;unistd." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://XiaoMing132.github.io/post/c&#43;&#43;_socket/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-09-29T21:34:19+08:00" />
+<meta property="article:modified_time" content="2022-09-29T21:34:19+08:00" />
+
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://XiaoMing132.github.io/"><img class="app-header-avatar" src="/avatar.jpg" alt="John Doe" /></a>
+      <h1>永远相信美好的事情即将发生</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vehicula turpis sit amet elit pretium.</p>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">C&#43;&#43;基本网络编程</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Sep 29, 2022
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          3 min read
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <p>#本教程主要讲述的是c++网络编程，需要一定的c++基础和计算机网络基础以及操作系统基础，话不多说，直接开始教程
+###首先还是来介绍一些名词</p>
+<blockquote>
+<p><strong>socket</strong>:  通道，运行在计算机的两个程序通过socket建立起一个通道,数据在通道中传输
+<strong>socket的分类</strong>: socket提供了流(stream) 和 数据表(datagram)两种通信机制，stream采用tcp，datagram采用udp协议。至于这两种协议有什么区别就不介绍了，但凡学过计网的应该都懂吧
+<strong>memset函数</strong>:给数组或结构图初始化函数，需包含头文件&lt;cstring&gt; memset(a,0,sizeiof(a)) 参数分别为指向数组的指针,初始化的值，大小
+<strong>socket函数</strong>: 创建通道的函数，需包含头文件&lt;sys/socket.h&gt;，函数原型:int socket(int af, int type, int protocol);    参数:af 为地址族（Address Family），也就是 IP 地址类型，常用的有 AF_INET 和 AF_INET6。  type 为数据传输方式/套接字类型，常用的有 SOCK_STREAM（流格式套接字/面向连接的套接字） 和 SOCK_DGRAM（数据报套接字/无连接的套接字）protocol 表示传输协议，常用的有 IPPROTO_TCP 和 IPPTOTO_UDP，分别表示 TCP 传输协议和 UDP 传输协议。返回值为 0 1 -1，0和1都是有效的，0代表标准输入，1代表标准输出，-1代表创建失败
+<strong>主机字节序和网络字节系</strong>:字节序是指占内存多于一个字节类型的数据在内存中的存放顺序，一个32位整数由4个字节组成。在内存中由两种存储方法:一种是将低字节序存储在起始地址，称为小端存储。另外一种则是将高字节序存储在起始地址，称为大端存储。列如  <em>0x12345678</em>  这个数据大端存储和小端存储分别为:
+大端存储: 12 34 56 78
+小端存储：78 56 34 12
+网络字节序是TCP/IP中规定好的一种数据表示格式采用大端存储，主机字节序与网络字节序不同，它与cpu的设置有关，由的是大端存储，有的是小端存储。为了避免字节序不一样，我们在通信中统一采用网络字节序。
+网络字节序和主机字节序的转换函数:htosn(),ntohs(),htonl(),ntohl()。htons和ntohs完成16位无符号数的相互转化，另外两个完成的是32位无符号数的转换</p>
+</blockquote>
+<p>####1:接下来是服务端的工作流程:
+1.创建服务端的socket。
+2.把服务端用于通信的地址和端口绑定到socket上。
+3.把socket设置为监听模式。
+4.接受客户端的连接。
+5.与客户端通信，接收客户端发过来的报文后，回复处理结果。
+6.不断的重复第5步，直到客户端断开连接。
+7.关闭socket，释放资源。
+#####服务端代码展示server.cpp</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;netdb.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/types.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/socket.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;arpa/inet.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc,<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>argv[])
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (argc<span style="color:#f92672">!=</span><span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    printf(<span style="color:#e6db74">&#34;please input a port after ./server</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>); <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第1步：创建服务端的socket。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> listenfd;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> ( (listenfd <span style="color:#f92672">=</span> socket(AF_INET,SOCK_STREAM,<span style="color:#ae81ff">0</span>))<span style="color:#f92672">==-</span><span style="color:#ae81ff">1</span>) { perror(<span style="color:#e6db74">&#34;socket&#34;</span>); <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>; }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第2步：把服务端用于通信的地址和端口绑定到socket上。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">sockaddr_in</span> servaddr;    <span style="color:#75715e">// 服务端地址信息的数据结构。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  memset(<span style="color:#f92672">&amp;</span>servaddr,<span style="color:#ae81ff">0</span>,<span style="color:#66d9ef">sizeof</span>(servaddr));
+</span></span><span style="display:flex;"><span>  servaddr.sin_family <span style="color:#f92672">=</span> AF_INET;  <span style="color:#75715e">// 协议族，在socket编程中只能是AF_INET。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  servaddr.sin_addr.s_addr <span style="color:#f92672">=</span> htonl(INADDR_ANY);          <span style="color:#75715e">// 任意ip地址。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#75715e">//servaddr.sin_addr.s_addr = inet_addr(&#34;192.168.190.134&#34;); // 指定ip地址。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  servaddr.sin_port <span style="color:#f92672">=</span> htons(atoi(argv[<span style="color:#ae81ff">1</span>]));  <span style="color:#75715e">// 指定通信端口。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (bind(listenfd,(<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">sockaddr</span> <span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>servaddr,<span style="color:#66d9ef">sizeof</span>(servaddr)) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> )
+</span></span><span style="display:flex;"><span>  { perror(<span style="color:#e6db74">&#34;bind&#34;</span>); close(listenfd); <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>; }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第3步：把socket设置为监听模式。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">if</span> (listen(listenfd,<span style="color:#ae81ff">5</span>) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> ) { perror(<span style="color:#e6db74">&#34;listen&#34;</span>); close(listenfd); <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>; }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第4步：接受客户端的连接。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span>  clientfd;                  <span style="color:#75715e">// 客户端的socket。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span>  socklen<span style="color:#f92672">=</span><span style="color:#66d9ef">sizeof</span>(<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">sockaddr_in</span>); <span style="color:#75715e">// struct sockaddr_in的大小
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">sockaddr_in</span> clientaddr;  <span style="color:#75715e">// 客户端的地址信息。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  clientfd<span style="color:#f92672">=</span>accept(listenfd,(<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">sockaddr</span> <span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>clientaddr,(socklen_t<span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>socklen);
+</span></span><span style="display:flex;"><span>  printf(<span style="color:#e6db74">&#34;客户端（%s）已连接。</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,inet_ntoa(clientaddr.sin_addr));
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第5步：与客户端通信，接收客户端发过来的报文后，回复ok。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">char</span> buffer[<span style="color:#ae81ff">1024</span>];
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> iret;
+</span></span><span style="display:flex;"><span>    memset(buffer,<span style="color:#ae81ff">0</span>,<span style="color:#66d9ef">sizeof</span>(buffer));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ( (iret<span style="color:#f92672">=</span>recv(clientfd,buffer,<span style="color:#66d9ef">sizeof</span>(buffer),<span style="color:#ae81ff">0</span>))<span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">0</span>) <span style="color:#75715e">// 接收客户端的请求报文。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    {
+</span></span><span style="display:flex;"><span>       printf(<span style="color:#e6db74">&#34;iret=%d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,iret); <span style="color:#66d9ef">break</span>;  
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    printf(<span style="color:#e6db74">&#34;接收：%s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,buffer);
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>    strcpy(buffer,<span style="color:#e6db74">&#34;ok&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ( (iret<span style="color:#f92672">=</span>send(clientfd,buffer,strlen(buffer),<span style="color:#ae81ff">0</span>))<span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">0</span>) <span style="color:#75715e">// 向客户端发送响应结果。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    { perror(<span style="color:#e6db74">&#34;send&#34;</span>); <span style="color:#66d9ef">break</span>; }
+</span></span><span style="display:flex;"><span>    printf(<span style="color:#e6db74">&#34;发送：%s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,buffer);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第6步：关闭socket，释放资源。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  close(listenfd); close(clientfd);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>####2:接下来是客户端的工作流程:
+1.创建客户端的socket。
+2.向服务器发起连接请求。
+3.与服务端通信，发送一个报文后等待回复，然后再发下一个报文。
+4.不断的重复第3）步，直到全部的数据被发送完。
+5.第4步：关闭socket，释放资源。
+#####客户端代码展示client.cpp</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdio.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unistd.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;stdlib.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;netdb.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/types.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;sys/socket.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;arpa/inet.h&gt;</span><span style="color:#75715e">
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argc,<span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>argv[])
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (argc<span style="color:#f92672">!=</span><span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    printf(<span style="color:#e6db74">&#34;please input a port after ./server</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>); <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第1步：创建客户端的socket。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">int</span> sockfd;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> ( (sockfd <span style="color:#f92672">=</span> socket(AF_INET,SOCK_STREAM,<span style="color:#ae81ff">0</span>))<span style="color:#f92672">==-</span><span style="color:#ae81ff">1</span>) { perror(<span style="color:#e6db74">&#34;socket&#34;</span>); <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>; }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第2步：向服务器发起连接请求。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">hostent</span><span style="color:#f92672">*</span> h;
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> ( (h <span style="color:#f92672">=</span> gethostbyname(argv[<span style="color:#ae81ff">1</span>])) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> )   <span style="color:#75715e">// 指定服务端的ip地址。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  { printf(<span style="color:#e6db74">&#34;gethostbyname failed.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>); close(sockfd); <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>; }
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">sockaddr_in</span> servaddr;
+</span></span><span style="display:flex;"><span>  memset(<span style="color:#f92672">&amp;</span>servaddr,<span style="color:#ae81ff">0</span>,<span style="color:#66d9ef">sizeof</span>(servaddr));
+</span></span><span style="display:flex;"><span>  servaddr.sin_family <span style="color:#f92672">=</span> AF_INET;
+</span></span><span style="display:flex;"><span>  servaddr.sin_port <span style="color:#f92672">=</span> htons(atoi(argv[<span style="color:#ae81ff">2</span>])); <span style="color:#75715e">// 指定服务端的通信端口。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  memcpy(<span style="color:#f92672">&amp;</span>servaddr.sin_addr,h<span style="color:#f92672">-&gt;</span>h_addr,h<span style="color:#f92672">-&gt;</span>h_length);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (connect(sockfd, (<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">sockaddr</span> <span style="color:#f92672">*</span>)<span style="color:#f92672">&amp;</span>servaddr,<span style="color:#66d9ef">sizeof</span>(servaddr)) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>)  <span style="color:#75715e">// 向服务端发起连接清求。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  { perror(<span style="color:#e6db74">&#34;connect&#34;</span>); close(sockfd); <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>; }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">char</span> buffer[<span style="color:#ae81ff">1024</span>];
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第3步：与服务端通信，发送一个报文后等待回复，然后再发下一个报文。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>;i<span style="color:#f92672">&lt;</span><span style="color:#ae81ff">6</span>;i<span style="color:#f92672">++</span>)
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> iret;
+</span></span><span style="display:flex;"><span>    memset(buffer,<span style="color:#ae81ff">0</span>,<span style="color:#66d9ef">sizeof</span>(buffer));
+</span></span><span style="display:flex;"><span>    sprintf(buffer,<span style="color:#e6db74">&#34;这是第%d个数据包&#34;</span>,i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ( (iret<span style="color:#f92672">=</span>send(sockfd,buffer,strlen(buffer),<span style="color:#ae81ff">0</span>))<span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">0</span>) <span style="color:#75715e">// 向服务端发送请求报文。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    { perror(<span style="color:#e6db74">&#34;send&#34;</span>); <span style="color:#66d9ef">break</span>; }
+</span></span><span style="display:flex;"><span>    printf(<span style="color:#e6db74">&#34;发送：%s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,buffer);
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>    memset(buffer,<span style="color:#ae81ff">0</span>,<span style="color:#66d9ef">sizeof</span>(buffer));
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> ( (iret<span style="color:#f92672">=</span>recv(sockfd,buffer,<span style="color:#66d9ef">sizeof</span>(buffer),<span style="color:#ae81ff">0</span>))<span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">0</span>) <span style="color:#75715e">// 接收服务端的回应报文。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    {
+</span></span><span style="display:flex;"><span>       printf(<span style="color:#e6db74">&#34;iret=%d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,iret); <span style="color:#66d9ef">break</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    printf(<span style="color:#e6db74">&#34;接收：%s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>,buffer);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#75715e">// 第4步：关闭socket，释放资源。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>  close(sockfd);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p><strong>注意:使用的端口都需要开放</strong>
+###一些需要注意的点
+1、socket文件描述符</p>
+<p>在UNIX系统中，一切输入输出设备皆文件，socket()函数的返回值其本质是一个文件描述符，是一个整数。</p>
+<p>2、服务端程序绑定地址
+如果服务器有多个网卡，多个IP地址，socket通信可以指定用其中一个地址来进行通信，也可以任意ip地址。</p>
+<pre><code>  1.指定ip地址的代码
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>m_servaddr.sin_addr.s_addr <span style="color:#f92672">=</span> inet_addr(<span style="color:#e6db74">&#34;192.168.149.129&#34;</span>);  <span style="color:#75715e">// 指定ip地址
+</span></span></span></code></pre></div><pre><code>  2.任意ip地址的代码
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>  m_servaddr.sin_addr.s_addr <span style="color:#f92672">=</span> htonl(INADDR_ANY);  <span style="color:#75715e">// 本主机的任意ip地址
+</span></span></span></code></pre></div><p>在实际开发中，采用任意ip地址的方式比较多。
+3、服务端程序绑定的通信端口</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span> m_servaddr.sin_port <span style="color:#f92672">=</span> htons(<span style="color:#ae81ff">5000</span>);  <span style="color:#75715e">// 通信端口
+</span></span></span></code></pre></div><p>4、客户端程序指定服务端的ip地址</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">hostent</span><span style="color:#f92672">*</span> h;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> ( (h <span style="color:#f92672">=</span> gethostbyname(<span style="color:#e6db74">&#34;118.89.50.198&#34;</span>)) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> )   <span style="color:#75715e">// 指定服务端的ip地址。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>{ printf(<span style="color:#e6db74">&#34;gethostbyname failed.</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>); close(sockfd); <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>; }
+</span></span></code></pre></div><p>5、客户端程序指定服务端的通信端口</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>servaddr.sin_port <span style="color:#f92672">=</span> htons(<span style="color:#ae81ff">5000</span>);
+</span></span></code></pre></div><p>6、send函数
+send函数用于把数据通过socket发送给对端。不论是客户端还是服务端，应用程序都用send函数来向TCP连接的另一端发送数据。</p>
+<p>函数声明：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>ssize_t <span style="color:#a6e22e">send</span>(<span style="color:#66d9ef">int</span> sockfd, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>buf, size_t len, <span style="color:#66d9ef">int</span> flags);
+</span></span></code></pre></div><p>sockfd为已建立好连接的socket。</p>
+<p>buf为需要发送的数据的内存地址，可以是C语言基本数据类型变量的地址，也可以数组、结构体、字符串，内存中有什么就发送什么。</p>
+<p>len需要发送的数据的长度，为buf中有效数据的长度。</p>
+<p>flags填0, 其他数值意义不大。</p>
+<p>函数返回已发送的字符数。出错时返回-1，错误信息errno被标记。</p>
+<p>注意，就算是网络断开，或socket已被对端关闭，send函数不会立即报错，要过几秒才会报错。</p>
+<p>如果send函数返回的错误（&lt;=0），表示通信链路已不可用。
+7、recv函数
+recv函数用于接收对端socket发送过来的数据。</p>
+<p>recv函数用于接收对端通过socket发送过来的数据。不论是客户端还是服务端，应用程序都用recv函数接收来自TCP连接的另一端发送过来数据。</p>
+<p>函数声明：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>ssize_t <span style="color:#a6e22e">recv</span>(<span style="color:#66d9ef">int</span> sockfd, <span style="color:#66d9ef">void</span> <span style="color:#f92672">*</span>buf, size_t len, <span style="color:#66d9ef">int</span> flags);
+</span></span></code></pre></div><p>sockfd为已建立好连接的socket。</p>
+<p>buf为用于接收数据的内存地址，可以是C语言基本数据类型变量的地址，也可以数组、结构体、字符串，只要是一块内存就行了。</p>
+<p>len需要接收数据的长度，不能超过buf的大小，否则内存溢出。</p>
+<p>flags填0, 其他数值意义不大。</p>
+<p>函数返回已接收的字符数。出错时返回-1，失败时不会设置errno的值。</p>
+<p>如果socket的对端没有发送数据，recv函数就会等待，如果对端发送了数据，函数返回接收到的字符数。出错时返回-1。如果socket被对端关闭，返回值为0。</p>
+<p>如果recv函数返回的错误（&lt;=0），表示通信通道已不可用。
+8、服务端有两个socket
+对服务端来说，有两个socket，一个是用于监听的socket，还有一个就是客户端连接成功后，由accept函数创建的用于与客户端收发报文的socket。</p>
+<p>9、程序退出时先关闭socket
+socket是系统资源，操作系统打开的socket数量是有限的，在程序退出之前必须关闭已打开的socket，就像关闭文件指针一样，就像delete已分配的内存一样，极其重要。</p>
+<p>值得注意的是，关闭socket的代码不能只在main函数的最后，那是程序运行的理想状态，还应该在main函数的每个return之前关闭。</p>
+<p>##该项目使用的库函数
+####1、socket函数
+socket函数用于创建一个新的socket，也就是向系统申请一个socket资源。socket函数用户客户端和服务端。</p>
+<p>函数声明：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">socket</span>(<span style="color:#66d9ef">int</span> domain, <span style="color:#66d9ef">int</span> type, <span style="color:#66d9ef">int</span> protocol);
+</span></span></code></pre></div><p>参数说明：</p>
+<p>domain：协议域，又称协议族（family）。常用的协议族有AF_INET、AF_INET6、AF_LOCAL（或称AF_UNIX，Unix域Socket）、AF_ROUTE等。协议族决定了socket的地址类型，在通信中必须采用对应的地址，如AF_INET决定了要用ipv4地址（32位的）与端口号（16位的）的组合、AF_UNIX决定了要用一个绝对路径名作为地址。</p>
+<p>type：指定socket类型。常用的socket类型有SOCK_STREAM、SOCK_DGRAM、SOCK_RAW、SOCK_PACKET、SOCK_SEQPACKET等。流式socket（SOCK_STREAM）是一种面向连接的socket，针对于面向连接的TCP服务应用。数据报式socket（SOCK_DGRAM）是一种无连接的socket，对应于无连接的UDP服务应用。</p>
+<p>protocol：指定协议。常用协议有IPPROTO_TCP、IPPROTO_UDP、IPPROTO_STCP、IPPROTO_TIPC等，分别对应TCP传输协议、UDP传输协议、STCP传输协议、TIPC传输协议。</p>
+<p>说了一大堆废话，第一个参数只能填AF_INET，第二个参数只能填SOCK_STREAM，第三个参数只能填0。</p>
+<p>除非系统资料耗尽，socket函数一般不会返回失败。</p>
+<p>返回值：成功则返回一个socket，失败返回-1，错误原因存于errno 中。</p>
+<p>####2、gethostbyname函数
+把ip地址或域名转换为hostent 结构体表达的地址。</p>
+<p>函数声明：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> hostent <span style="color:#f92672">*</span><span style="color:#a6e22e">gethostbyname</span>(<span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>name);
+</span></span></code></pre></div><p>参数name，域名或者主机名，例如&quot;192.168.1.3&quot;、&ldquo;<a href="https://www.freecplus.net">www.freecplus.net</a>&quot;等。</p>
+<p>返回值：如果成功，返回一个hostent结构指针，失败返回NULL。</p>
+<p>gethostbyname只用于客户端。</p>
+<p>gethostbyname只是把字符串的ip地址转换为结构体的ip地址，只要地址格式没错，一般不会返回错误。失败时不会设置errno的值。</p>
+<p>####3、connect函数
+向服务器发起连接请求。</p>
+<p>函数声明：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">connect</span>(<span style="color:#66d9ef">int</span> sockfd, <span style="color:#66d9ef">struct</span> sockaddr <span style="color:#f92672">*</span> serv_addr, <span style="color:#66d9ef">int</span> addrlen);
+</span></span></code></pre></div><p>函数说明：connect函数用于将参数sockfd 的socket 连至参数serv_addr 指定的服务端，参数addrlen为sockaddr的结构长度。</p>
+<p>返回值：成功则返回0，失败返回-1，错误原因存于errno 中。</p>
+<p>connect函数只用于客户端。</p>
+<p>如果服务端的地址错了，或端口错了，或服务端没有启动，connect一定会失败。</p>
+<p>####4、bind函数
+服务端把用于通信的地址和端口绑定到socket上。</p>
+<p>函数声明：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">bind</span>(<span style="color:#66d9ef">int</span> sockfd, <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">struct</span> sockaddr <span style="color:#f92672">*</span>addr,socklen_t addrlen);
+</span></span></code></pre></div><p>参数sockfd，需要绑定的socket。</p>
+<p>参数addr，存放了服务端用于通信的地址和端口。</p>
+<p>参数addrlen表示addr结构体的大小。</p>
+<p>返回值：成功则返回0，失败返回-1，错误原因存于errno 中。</p>
+<p>如果绑定的地址错误，或端口已被占用，bind函数一定会报错，否则一般不会返回错误。</p>
+<p>####5、listen函数
+listen函数把主动连接socket变为被动连接的socket，使得这个socket可以接受其它socket的连接请求，从而成为一个服务端的socket。</p>
+<p>函数声明：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">listen</span>(<span style="color:#66d9ef">int</span> sockfd, <span style="color:#66d9ef">int</span> backlog);
+</span></span></code></pre></div><p>返回：0-成功， -1-失败</p>
+<p>参数sockfd是已经被bind过的socket。socket函数返回的socket是一个主动连接的socket，在服务端的编程中，程序员希望这个socket可以接受外来的连接请求，也就是被动等待客户端来连接。由于系统默认时认为一个socket是主动连接的，所以需要通过某种方式来告诉系统，程序员通过调用listen函数来完成这件事。</p>
+<p>参数backlog，这个参数涉及到一些网络的细节，比较麻烦，填5、10都行，一般不超过30。</p>
+<p>当调用listen之后，服务端的socket就可以调用accept来接受客户端的连接请求。</p>
+<p>返回值：成功则返回0，失败返回-1，错误原因存于errno 中。</p>
+<p>listen函数一般不会返回错误。</p>
+<p>####6、accept函数
+服务端接受客户端的连接。</p>
+<p>函数声明：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">accept</span>(<span style="color:#66d9ef">int</span> sockfd,<span style="color:#66d9ef">struct</span> sockaddr <span style="color:#f92672">*</span>addr,socklen_t <span style="color:#f92672">*</span>addrlen);
+</span></span></code></pre></div><p>参数sockfd是已经被listen过的socket。</p>
+<p>参数addr用于存放客户端的地址信息，用sockaddr结构体表达，如果不需要客户端的地址，可以填0。</p>
+<p>参数addrlen用于存放addr参数的长度，如果addr为0，addrlen也填0。</p>
+<p>accept函数等待客户端的连接，如果没有客户端连上来，它就一直等待，这种方式称之为阻塞。</p>
+<p>accept等待到客户端的连接后，创建一个新的socket，函数返回值就是这个新的socket，服务端使用这个新的socket和客户端进行报文的收发。</p>
+<p>返回值：成功则返回0，失败返回-1，错误原因存于errno 中。</p>
+<p>accept在等待的过程中，如果被中断或其它的原因，函数返回-1，表示失败，如果失败，可以重新accept。</p>
+<p>####7、函数小结
+####服务端函数调用的流程是：socket-&gt;bind-&gt;listen-&gt;accept-&gt;recv/send-&gt;close</p>
+<p>####客户端函数调用的流程是：socket-&gt;connect-&gt;send/recv-&gt;close</p>
+<p>其中send/recv可以进行多次交互。</p>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
