@@ -6,7 +6,41 @@
     <description>Recent content on 永远相信美好的事情即将发生</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 06 Oct 2022 18:35:41 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 04 Nov 2022 11:42:05 +0800</lastBuildDate><atom:link href="https://XiaoMing132.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>linux下gdb的基本调试</title>
+      <link>https://XiaoMing132.github.io/post/gdb/</link>
+      <pubDate>Fri, 04 Nov 2022 11:42:05 +0800</pubDate>
+      
+      <guid>https://XiaoMing132.github.io/post/gdb/</guid>
+      <description>###gdb是linux下一款调试C和CPP的工具
+1:首先安装GDB
+sudo apt install gdb 2:编译当前目录下的 test.cpp 文件，若要启用调试需要加-g选
+g++ test.cpp -o test -g 3:接下来便可以使用gdb进行调试了
+gdb test ###GDB常用的调试命令
+set args
+设置主程序的参数。 例如：./book119 /oracle/c/book1.c /tmp/book1.c 设置参数的方法是： gdb book119 (gdb) set args /oracle/c/book1.c /tmp/book1.c break 缩写 b
+设置断点，b 20 表示在第20行设置断点，可以设置多个断点。 run 缩写r
+开始运行程序, 程序运行到断点的位置会停下来，如果没有遇到断点，程序一直运行下去。 next 缩写n
+执行当前行语句，如果该语句为函数调用，不会进入函数内部执行。 step 缩写s
+执行当前行语句，如果该语句为函数调用，则进入函数执行其中的第一条语句。 注意了，如果函数是库函数或第三方提供的函数，用s也是进不去的，因为没有源代码，如果是您自定义的函数，只要有源码就可以进去。 print 缩写p
+显示变量值，例如：p name表示显示变量name的值。 continue 缩写c
+继续程序的运行，直到遇到下一个断点。 set var name=value
+设置变量的值，假设程序有两个变量：int ii; char name[21]; set var ii=10 把ii的值设置为10； set var name=&amp;quot;西施&amp;quot; 把name的值设置为&amp;quot;西施&amp;quot;，注意，不是strcpy。 quit 缩写q</description>
+    </item>
+    
+    <item>
+      <title>linux连接Windows远程桌面</title>
+      <link>https://XiaoMing132.github.io/post/rdesktop/</link>
+      <pubDate>Thu, 03 Nov 2022 22:43:18 +0800</pubDate>
+      
+      <guid>https://XiaoMing132.github.io/post/rdesktop/</guid>
+      <description>##本文介绍的是在linux连接远程桌面，相对比较简单 ####连接远程桌面需要一个客户端，windows下面是mstsc。linux在这里我们使用rdesktop这个远程连接软件
+1:下载软件，软件下载有很多种方法，我使用的是ubuntu系统，在这里我们直接使用apt进行安装
+sudo apt install rdesktop 2:使用rdesktop命令进行远程连接
+rdesktop -u username -p passwd IP ####注意，使用rdesktop命令需要你的Windows打开允许任意版本连接远程桌面，这一步大家就自行百度了</description>
+    </item>
+    
     <item>
       <title>linux关闭终端保持进程持续运行</title>
       <link>https://XiaoMing132.github.io/post/pro/</link>

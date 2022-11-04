@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>linux下gdb的基本调试 // 永远相信美好的事情即将发生</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.102.3" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="John Doe" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="https://XiaoMing132.github.io/css/main.min.88e7083eff65effb7485b6e6f38d10afbec25093a6fac42d734ce9024d3defbd.css" />
+
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="linux下gdb的基本调试"/>
+<meta name="twitter:description" content="###gdb是linux下一款调试C和CPP的工具
+1:首先安装GDB
+sudo apt install gdb 2:编译当前目录下的 test.cpp 文件，若要启用调试需要加-g选
+g&#43;&#43; test.cpp -o test -g 3:接下来便可以使用gdb进行调试了
+gdb test ###GDB常用的调试命令
+set args
+设置主程序的参数。 例如：./book119 /oracle/c/book1.c /tmp/book1.c 设置参数的方法是： gdb book119 (gdb) set args /oracle/c/book1.c /tmp/book1.c break 缩写 b
+设置断点，b 20 表示在第20行设置断点，可以设置多个断点。 run 缩写r
+开始运行程序, 程序运行到断点的位置会停下来，如果没有遇到断点，程序一直运行下去。 next 缩写n
+执行当前行语句，如果该语句为函数调用，不会进入函数内部执行。 step 缩写s
+执行当前行语句，如果该语句为函数调用，则进入函数执行其中的第一条语句。 注意了，如果函数是库函数或第三方提供的函数，用s也是进不去的，因为没有源代码，如果是您自定义的函数，只要有源码就可以进去。 print 缩写p
+显示变量值，例如：p name表示显示变量name的值。 continue 缩写c
+继续程序的运行，直到遇到下一个断点。 set var name=value
+设置变量的值，假设程序有两个变量：int ii; char name[21]; set var ii=10 把ii的值设置为10； set var name=&quot;西施&quot; 把name的值设置为&quot;西施&quot;，注意，不是strcpy。 quit 缩写q"/>
+
+    <meta property="og:title" content="linux下gdb的基本调试" />
+<meta property="og:description" content="###gdb是linux下一款调试C和CPP的工具
+1:首先安装GDB
+sudo apt install gdb 2:编译当前目录下的 test.cpp 文件，若要启用调试需要加-g选
+g&#43;&#43; test.cpp -o test -g 3:接下来便可以使用gdb进行调试了
+gdb test ###GDB常用的调试命令
+set args
+设置主程序的参数。 例如：./book119 /oracle/c/book1.c /tmp/book1.c 设置参数的方法是： gdb book119 (gdb) set args /oracle/c/book1.c /tmp/book1.c break 缩写 b
+设置断点，b 20 表示在第20行设置断点，可以设置多个断点。 run 缩写r
+开始运行程序, 程序运行到断点的位置会停下来，如果没有遇到断点，程序一直运行下去。 next 缩写n
+执行当前行语句，如果该语句为函数调用，不会进入函数内部执行。 step 缩写s
+执行当前行语句，如果该语句为函数调用，则进入函数执行其中的第一条语句。 注意了，如果函数是库函数或第三方提供的函数，用s也是进不去的，因为没有源代码，如果是您自定义的函数，只要有源码就可以进去。 print 缩写p
+显示变量值，例如：p name表示显示变量name的值。 continue 缩写c
+继续程序的运行，直到遇到下一个断点。 set var name=value
+设置变量的值，假设程序有两个变量：int ii; char name[21]; set var ii=10 把ii的值设置为10； set var name=&quot;西施&quot; 把name的值设置为&quot;西施&quot;，注意，不是strcpy。 quit 缩写q" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://XiaoMing132.github.io/post/gdb/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-11-04T11:42:05+08:00" />
+<meta property="article:modified_time" content="2022-11-04T11:42:05+08:00" />
+
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href="https://XiaoMing132.github.io/"><img class="app-header-avatar" src="/avatar.jpg" alt="John Doe" /></a>
+      <h1>永远相信美好的事情即将发生</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vehicula turpis sit amet elit pretium.</p>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">linux下gdb的基本调试</h1>
+      <div class="post-meta">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Nov 4, 2022
+        </div>
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          1 min read
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <p>###gdb是linux下一款调试C和CPP的工具</p>
+<blockquote>
+<p><strong>1:首先安装GDB</strong></p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>sudo apt install gdb
+</span></span></code></pre></div><blockquote>
+<p><strong>2:编译当前目录下的 test.cpp 文件，若要启用调试需要加-g选</strong></p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>g++ test.cpp -o test -g
+</span></span></code></pre></div><blockquote>
+<p><strong>3:接下来便可以使用gdb进行调试了</strong></p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>gdb test
+</span></span></code></pre></div><p>###GDB常用的调试命令</p>
+<blockquote>
+<p><strong>set args</strong></p>
+</blockquote>
+<pre><code>    设置主程序的参数。
+
+    例如：./book119 /oracle/c/book1.c /tmp/book1.c
+
+    设置参数的方法是：
+
+    gdb book119
+
+    (gdb) set args /oracle/c/book1.c /tmp/book1.c
+</code></pre>
+<blockquote>
+<p><strong>break 缩写 b</strong></p>
+</blockquote>
+<pre><code>    设置断点，b 20 表示在第20行设置断点，可以设置多个断点。
+</code></pre>
+<blockquote>
+<p><strong>run 缩写r</strong></p>
+</blockquote>
+<pre><code>    开始运行程序, 程序运行到断点的位置会停下来，如果没有遇到断点，程序一直运行下去。        
+</code></pre>
+<blockquote>
+<p><strong>next 缩写n</strong></p>
+</blockquote>
+<pre><code>    执行当前行语句，如果该语句为函数调用，不会进入函数内部执行。
+</code></pre>
+<blockquote>
+<p><strong>step 缩写s</strong></p>
+</blockquote>
+<pre><code>    执行当前行语句，如果该语句为函数调用，则进入函数执行其中的第一条语句。
+
+    注意了，如果函数是库函数或第三方提供的函数，用s也是进不去的，因为没有源代码，如果是您自定义的函数，只要有源码就可以进去。
+</code></pre>
+<blockquote>
+<p><strong>print 缩写p</strong></p>
+</blockquote>
+<pre><code>    显示变量值，例如：p name表示显示变量name的值。
+</code></pre>
+<blockquote>
+<p><strong>continue 缩写c</strong></p>
+</blockquote>
+<pre><code>    继续程序的运行，直到遇到下一个断点。
+</code></pre>
+<blockquote>
+<p><strong>set var name=value</strong></p>
+</blockquote>
+<pre><code>    设置变量的值，假设程序有两个变量：int ii; char name[21];
+
+    set var ii=10 把ii的值设置为10；
+
+    set var name=&quot;西施&quot; 把name的值设置为&quot;西施&quot;，注意，不是strcpy。
+</code></pre>
+<blockquote>
+<blockquote>
+<p><strong>quit 缩写q</strong></p>
+</blockquote>
+</blockquote>
+<pre><code>    退出gdb环境。</code></pre>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
